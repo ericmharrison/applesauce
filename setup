@@ -31,6 +31,7 @@ do
   then
     echo "Installing $pkg"
     sudo apt-get -fy install $pkg
+    echo ${pkginstalled:11}
   else
     echo ${pkginstalled:11}
   fi
