@@ -2,7 +2,8 @@ whoisthis="Eric Harrison"  #your name, used for Git config
 youremail="ericmharrison@gmail.com"  #your email, used for Git config
 
 #update package list and upgrade all software
-sudo apt-get update && sudo apt-get full-upgrade
+sudo apt-get update && sudo apt-get -fy full-upgrade
+sudo apt -fy install software-properties-common apt-transport-https wget
 
 #check for git
 hasgit=$(apt list git --installed 2>/dev/null)
@@ -22,6 +23,14 @@ git config --global user.email "$youremail"
 echo
 echo "Git User Name: $(git config --global --get user.name)"
 echo "Git User Email: $(git config --global --get user.email)"
+
+#add keys for new repositories
+echo "Adding keys"
+while read key
+do
+  echo $key
+  wget -q $key -O- | sudo apt-key add -
+done <keys
 
 #install packages from list in the file
 while read pkg
