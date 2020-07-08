@@ -9,7 +9,7 @@ hasgit=$(apt list git --installed 2>/dev/null)
 if [ "$hasgit" == "Listing..." ]
 then
   echo "Git's not installed! Let's fix that!"
-  sudo apt-get git
+  sudo apt-get -fy install git
 fi
 
 #congratulate yourself
@@ -22,3 +22,16 @@ git config --global user.email "$youremail"
 echo
 echo "Git User Name: $(git config --global --get user.name)"
 echo "Git User Email: $(git config --global --get user.email)"
+
+#install packages from list in the file
+while read pkg
+do
+  pkginstalled=$(apt list $pkg --installed 2>/dev/null)
+  if [ "$pkginstalled" == "Listing..." ]
+  then
+    echo "Installing $pkg"
+    sudo apt-get -fy install $pkg
+  else
+    echo ${pkginstalled:11}
+  fi
+done <packages
