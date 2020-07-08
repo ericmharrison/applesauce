@@ -32,6 +32,15 @@ do
   wget -q $key -O- | sudo apt-key add -
 done <keys
 
+#add repositories for package downloads
+echo "Adding repositories"
+while read repo
+do
+  echo $repo
+  sudo add-apt-repository "$repo"
+done <repositories
+sudo apt update
+
 #install packages from list in the file
 while read pkg
 do
