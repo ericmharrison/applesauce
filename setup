@@ -57,9 +57,3 @@ do
     echo ${pkginstalled:11}
   fi
 done <packages
-
-#install snaps from list in the file
-while read snap
-do
-  sudo snap install $snap --classic
-done <snaps

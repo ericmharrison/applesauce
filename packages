@@ -12,3 +12,5 @@ software-properties-common
 docker-ce
 docker-ce-cli
 containerd.io
+gnupg2
+kubectl
