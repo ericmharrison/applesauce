@@ -44,7 +44,7 @@ sudo apt update 2>/dev/null
 #uninstall old Docker versions if they exist
 sudo apt-get -fy remove docker docker-engine docker.io containerd runc 2>/dev/null
 
-#install packages from list in the file
+#install apt packages from list in the file
 while read pkg
 do
   pkginstalled=$(apt list $pkg --installed 2>/dev/null)
@@ -57,3 +57,9 @@ do
     echo ${pkginstalled:11}
   fi
 done <packages
+
+#install snaps from list in the file
+while read snap
+do
+  sudo snap install $snap --classic
+done <snaps
