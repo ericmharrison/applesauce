@@ -2,7 +2,7 @@ whoisthis="Eric Harrison"  #your name, used for Git config
 youremail="ericmharrison@gmail.com"  #your email, used for Git config
 
 #update package list and upgrade all software
-sudo apt-get update && sudo apt-get -fy full-upgrade
+sudo apt-get update 2>/dev/null && sudo apt-get -fy full-upgrade
 sudo apt -fy install software-properties-common apt-transport-https wget
 
 #check for git
@@ -37,9 +37,12 @@ echo "Adding repositories"
 while read repo
 do
   echo $repo
-  sudo add-apt-repository "$repo"
+  sudo add-apt-repository "$repo" 2>/dev/null
 done <repositories
-sudo apt update
+sudo apt update 2>/dev/null
+
+#uninstall old Docker versions if they exist
+sudo apt-get -fy remove docker docker-engine docker.io containerd runc 2>/dev/null
 
 #install packages from list in the file
 while read pkg
