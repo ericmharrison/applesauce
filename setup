@@ -38,7 +38,7 @@ do
   wget -nc $url
 done <files
 
-#install GO
+#install Go
 if [ ! -d "/usr/local/go" ]
 then
   tar -xvf go1.14.4.linux-amd64.tar.gz
@@ -50,6 +50,12 @@ then
 else
   echo "Go is already installed"
 fi
+
+#install Kind
+#if [ ! -f "/usr/local/kind" ]
+#then 
+
+
 
 #add repositories for package downloads
 echo "Adding repositories"
