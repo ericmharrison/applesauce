@@ -37,13 +37,13 @@ done <keys
 #download packages from list in file
 while read url
 do
-  wget -nc $url
+  wget -nc --directory-prefix=/home/eric/Downloads $url
 done <files
 
 #install Go
 if [ ! -d "$HOME/go" ]
 then
-  tar -xvf go1.14.4.linux-amd64.tar.gz
+  tar -xvf /home/eric/Downloads/go1.14.4.linux-amd64.tar.gz
   sudo chown -R root:root ./go
   sudo mv go /usr/local
   sudo echo "export GOPATH=$HOME/go" >> ~/.profile
