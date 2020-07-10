@@ -1,4 +1,5 @@
 #!/bin/bash 
+downloadfolder="/home/$USER/Downloads"  #location for downloaded installation files
 
 whoisthis="Eric Harrison"  #your name, used for Git config
 youremail="ericmharrison@gmail.com"  #your email, used for Git config
@@ -37,7 +38,7 @@ done <keys
 #download packages from list in file
 while read url
 do
-  wget -nc --directory-prefix=/home/eric/Downloads $url
+  wget -nc --directory-prefix="$downloadfolder"  $url
 done <files
 
 #install Go
@@ -83,8 +84,39 @@ done <packages
 sudo groupadd docker
 sudo usermod -aG docker ${USER}
 
+#install Stern
+if [ ! -d "$GOPATH/src/github.com/wercker" ]
+then
+  mkdir -p $GOPATH/src/github.com/wercker
+  cd $GOPATH/src/github.com/wercker
+  git clone https://github.com/wercker/stern.git && cd stern
+  govendor sync
+  go install
+  stern -v
+  echo "Stern installed successfully"
+else
+  echo "Stern is already installed"
+  stern -v
+fi
+
 #install Kind
 if [ ! -f "/usr/local/go/kind" ]
 then 
   GO111MODULE="on" go get sigs.k8s.io/kind@v0.8.1
+  kind --version
+  echo "Kind installed successfully"
+else
+  echo "Kind is already installed"
+  kind --version
+fi
+
+#install Terraform
+if [ ! -f "/usr/local/bin/terraform" ]
+then
+  sudo unzip "$downloadfolder/terraform_0.12.28_linux_amd64" -d /usr/local/bin
+  terraform -version
+  echo "Terraform installed successfully"
+else
+  echo "Terraform is already installed"
+  terraform -version
 fi

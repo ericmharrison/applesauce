@@ -13,3 +13,4 @@ docker-ce-cli
 containerd.io
 gnupg2
 kubectl
+govendor
