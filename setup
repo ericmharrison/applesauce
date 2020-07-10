@@ -39,22 +39,16 @@ do
 done <files
 
 #install Go
-if [ ! -d "/usr/local/go" ]
+if [ ! -d "$HOME/go" ]
 then
   tar -xvf go1.14.4.linux-amd64.tar.gz
   sudo chown -R root:root ./go
   sudo mv go /usr/local
-  sudo echo "export GOPATH=usr/local/go" >> ~/.profile
+  sudo echo "export GOPATH=$HOME/go" >> ~/.profile
   sudo echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> ~/.profile
   source ~/.profile
 else
   echo "Go is already installed"
-fi
-
-#install Kind
-if [ ! -f "/usr/local/go/kind" ]
-then 
-  GO111MODULE="on" go get sigs.k8s.io/kind@v0.8.1
 fi
 
 #add repositories for package downloads
@@ -82,3 +76,13 @@ do
     echo ${pkginstalled:11}
   fi
 done <packages
+
+#configure Docker
+sudo groupadd docker
+sudo usermod -aG docker ${USER}
+
+#install Kind
+if [ ! -f "/usr/local/go/kind" ]
+then 
+  GO111MODULE="on" go get sigs.k8s.io/kind@v0.8.1
+fi
