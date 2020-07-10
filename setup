@@ -1,3 +1,4 @@
+#!/bin/bash
 whoisthis="Eric Harrison"  #your name, used for Git config
 youremail="ericmharrison@gmail.com"  #your email, used for Git config
 
