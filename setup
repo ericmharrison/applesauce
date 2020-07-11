@@ -12,25 +12,25 @@ sudo apt-get update && sudo apt-get -fy full-upgrade
 sudo apt-get -fy remove docker docker-engine docker.io containerd runc
 
 #add public keys for new repositories
-#echo "Adding keys"
-#while read key
-#do
-#  echo $key
-#  wget -q $key -O- | sudo apt-key add -
-#done <keys
+echo "Adding keys"
+while read key
+do
+  echo $key
+  wget -q $key -O- | sudo apt-key add -
+done <keys
 
 #add repositories for apt package downloads
-#echo "Adding repositories"
-#while read repo
-#do
-#  if ! grep -q "^deb .*$repo" /etc/apt/sources.list /etc/apt/sources.list.d/*
-#  then
-#    sudo add-apt-repository "$repo" 
-#  else
-#    echo "Repo $repo already added"
-#  fi
-#done <repositories
-#sudo apt-get update 
+echo "Adding repositories"
+while read repo
+do
+  if ! grep -q "^deb .*$repo" /etc/apt/sources.list /etc/apt/sources.list.d/*
+  then
+    sudo add-apt-repository "$repo" 
+  else
+    echo "Repo $repo already added"
+  fi
+done <repositories
+sudo apt-get update 
 
 #install apt packages from list in the file
 while read pkg
