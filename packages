@@ -15,3 +15,5 @@ gnupg2
 kubectl
 govendor
 wget
+
+libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev asciidoc xmlto docbook2x
