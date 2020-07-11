@@ -14,3 +14,4 @@ containerd.io
 gnupg2
 kubectl
 govendor
+wget

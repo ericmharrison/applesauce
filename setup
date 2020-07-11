@@ -1,21 +1,57 @@
 #!/bin/bash 
-downloadfolder="/home/$USER/Downloads"  #location for downloaded installation files
+#setup script for dev environment
 
+downloadfolder="$HOME/Downloads"  #location for downloaded installation files
 whoisthis="Eric Harrison"  #your name, used for Git config
 youremail="ericmharrison@gmail.com"  #your email, used for Git config
 
 #update package list and upgrade all software
-sudo apt-get update 2>/dev/null && sudo apt-get -fy full-upgrade
-sudo apt -fy install software-properties-common apt-transport-https wget
+sudo apt-get update && sudo apt-get -fy full-upgrade
+
+#uninstall old Docker versions if they exist
+sudo apt-get -fy remove docker docker-engine docker.io containerd runc
+
+#add public keys for new repositories
+#echo "Adding keys"
+#while read key
+#do
+#  echo $key
+#  wget -q $key -O- | sudo apt-key add -
+#done <keys
+
+#add repositories for apt package downloads
+#echo "Adding repositories"
+#while read repo
+#do
+#  if ! grep -q "^deb .*$repo" /etc/apt/sources.list /etc/apt/sources.list.d/*
+#  then
+#    sudo add-apt-repository "$repo" 
+#  else
+#    echo "Repo $repo already added"
+#  fi
+#done <repositories
+#sudo apt-get update 
+
+#install apt packages from list in the file
+while read pkg
+do
+  pkginstalled=$(apt list $pkg --installed)
+  if [ "$pkginstalled" == "Listing..." ]
+  then
+    echo "Installing $pkg"
+    sudo apt-get -fy install $pkg
+    echo ${pkginstalled:11}
+  else
+    echo ${pkginstalled:11}
+  fi
+done <packages
 
 #check for git
-hasgit=$(apt list git --installed 2>/dev/null)
-if [ "$hasgit" == "Listing..." ]
+if [ ! -f "/usr/bin/git" ]
 then
   echo "Git's not installed! Let's fix that!"
   sudo apt-get -fy install git
 fi
-
 #congratulate yourself
 echo
 echo "Git is installed: $(git --version)"
@@ -27,13 +63,9 @@ echo
 echo "Git User Name: $(git config --global --get user.name)"
 echo "Git User Email: $(git config --global --get user.email)"
 
-#add keys for new repositories
-echo "Adding keys"
-while read key
-do
-  echo $key
-  wget -q $key -O- | sudo apt-key add -
-done <keys
+#configure Docker
+sudo groupadd docker
+sudo usermod -aG docker ${USER}
 
 #download packages from list in file
 while read url
@@ -44,45 +76,15 @@ done <files
 #install Go
 if [ ! -d "$HOME/go" ]
 then
-  tar -xvf /home/eric/Downloads/go1.14.4.linux-amd64.tar.gz
+  tar -xvf /"$downloadfolder/go1.14.4.linux-amd64.tar.gz"
   sudo chown -R root:root ./go
   sudo mv go /usr/local
-  sudo echo "export GOPATH=$HOME/go" >> ~/.profile
-  sudo echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> ~/.profile
-  source ~/.profile
+  sudo echo "export GOPATH=$HOME/go" >> "$HOME/.profile"
+  sudo echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> "$HOME/.profile"
+  source "$HOME/.profile"
 else
   echo "Go is already installed"
 fi
-
-#add repositories for package downloads
-echo "Adding repositories"
-while read repo
-do
-  echo $repo
-  sudo add-apt-repository "$repo" 2>/dev/null
-done <repositories
-sudo apt update 2>/dev/null
-
-#uninstall old Docker versions if they exist
-sudo apt-get -fy remove docker docker-engine docker.io containerd runc 2>/dev/null
-
-#install apt packages from list in the file
-while read pkg
-do
-  pkginstalled=$(apt list $pkg --installed 2>/dev/null)
-  if [ "$pkginstalled" == "Listing..." ]
-  then
-    echo "Installing $pkg"
-    sudo apt-get -fy install $pkg
-    echo ${pkginstalled:11}
-  else
-    echo ${pkginstalled:11}
-  fi
-done <packages
-
-#configure Docker
-sudo groupadd docker
-sudo usermod -aG docker ${USER}
 
 #install Stern
 if [ ! -d "$GOPATH/src/github.com/wercker" ]
@@ -100,7 +102,7 @@ else
 fi
 
 #install Kind
-if [ ! -f "/usr/local/go/kind" ]
+if [ ! -f "$GOPATH/kind" ]
 then 
   GO111MODULE="on" go get sigs.k8s.io/kind@v0.8.1
   kind --version
