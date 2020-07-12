@@ -7,3 +7,22 @@ youremail="ericmharrison@gmail.com"  #your email, used for Git config
 
 #update package list and upgrade all software
 sudo apt-get update && sudo apt-get -fy upgrade
+
+#check for any git and install if missing
+if [ ! find /usr/bin -name git ]
+  then sudo apt-get install git
+fi
+
+#pull git from git
+
+#install prerequisite git packages
+sudo apt-get install libcurl4-gnutls-dev\
+                     libexpat1-dev gettext\
+                     libz-dev\
+                     libssl-dev\
+                     asciidoc\
+                     xmlto\
+                     docbook2x
+
+
+
