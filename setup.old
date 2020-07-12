@@ -1,0 +1,124 @@
+#!/bin/bash 
+#setup script for dev environment
+
+downloadfolder="$HOME/Downloads"  #location for downloaded installation files
+whoisthis="Eric Harrison"  #your name, used for Git config
+youremail="ericmharrison@gmail.com"  #your email, used for Git config
+
+#update package list and upgrade all software
+sudo apt-get update && sudo apt-get -fy full-upgrade
+
+#uninstall old Docker versions if they exist
+sudo apt-get -fy remove docker docker-engine docker.io containerd runc
+
+#add public keys for new repositories
+echo "Adding keys"
+while read key
+do
+  echo $key
+  wget -q $key -O- | sudo apt-key add -
+done <keys
+
+#add repositories for apt package downloads
+echo "Adding repositories"
+while read repo
+do
+  if ! grep -q "^deb .*$repo" /etc/apt/sources.list /etc/apt/sources.list.d/*
+  then
+    sudo add-apt-repository "$repo" 
+  else
+    echo "Repo $repo already added"
+  fi
+done <repositories
+sudo apt-get update 
+
+#install apt packages from list in the file
+while read pkg
+do
+  pkginstalled=$(apt list $pkg --installed)
+  if [ "$pkginstalled" == "Listing..." ]
+  then
+    echo "Installing $pkg"
+    sudo apt-get -fy install $pkg
+    echo ${pkginstalled:11}
+  else
+    echo ${pkginstalled:11}
+  fi
+done <packages
+
+#check for git
+if [ ! -f "/usr/bin/git" ]
+then
+  echo "Git's not installed! Let's fix that!"
+  sudo apt-get -fy install git
+fi
+#congratulate yourself
+echo
+echo "Git is installed: $(git --version)"
+
+#configure git
+git config --global --replace-all user.name "$whoisthis"
+git config --global user.email "$youremail"
+echo
+echo "Git User Name: $(git config --global --get user.name)"
+echo "Git User Email: $(git config --global --get user.email)"
+
+#configure Docker
+sudo groupadd docker
+sudo usermod -aG docker ${USER}
+
+#download packages from list in file
+while read url
+do
+  wget -nc --directory-prefix="$downloadfolder"  $url
+done <files
+
+#install Go
+if [ ! -d "$HOME/go" ]
+then
+  tar -xvf /"$downloadfolder/go1.14.4.linux-amd64.tar.gz"
+  sudo chown -R root:root ./go
+  sudo mv go /usr/local
+  sudo echo "export GOPATH=$HOME/go" >> "$HOME/.profile"
+  sudo echo "export PATH=$PATH:/usr/local/go/bin:$GOPATH/bin" >> "$HOME/.profile"
+  source "$HOME/.profile"
+else
+  echo "Go is already installed"
+fi
+
+#install Stern
+if [ ! -d "$GOPATH/src/github.com/wercker" ]
+then
+  mkdir -p $GOPATH/src/github.com/wercker
+  cd $GOPATH/src/github.com/wercker
+  git clone https://github.com/wercker/stern.git && cd stern
+  govendor sync
+  go install
+  stern -v
+  echo "Stern installed successfully"
+else
+  echo "Stern is already installed"
+  stern -v
+fi
+
+#install Kind
+if [ ! -f "$GOPATH/kind" ]
+then 
+  GO111MODULE="on" go get sigs.k8s.io/kind@v0.8.1
+  kind --version
+  echo "Kind installed successfully"
+else
+  echo "Kind is already installed"
+  kind --version
+fi
+
+#install Terraform
+if [ ! -f "/usr/local/bin/terraform" ]
+then
+  sudo unzip "$downloadfolder/terraform_0.12.28_linux_amd64" -d /usr/local/bin
+  terraform -version
+  echo "Terraform installed successfully"
+else
+  echo "Terraform is already installed"
+  terraform -version
+fi
