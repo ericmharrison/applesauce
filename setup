@@ -50,12 +50,11 @@ if [ ! -d ~/git ]
   else #if git exists, make sure it's the latest version
     cd ~/git
     git_updated=$(git pull)
-    if [ $git_updated == "Already up to date." ]
+    if [ "$git_updated" == "Already up to date." ]
       then
         echo "Git is already up to date."
         break
       else
-        git pull
         make all doc info prefix="$gitfolder"
         sudo make install install-doc install-html install-man prefix="$gitfolder"
     fi
