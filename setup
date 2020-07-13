@@ -11,7 +11,7 @@ youremail="ericmharrison@gmail.com"  #your email, used for Git config
 sudo apt-get update && sudo apt-get -fy upgrade
 
 #check for any git and install if missing
-if [ find "$gitfolder/bin" -name git ]
+if [ $(find "$gitfolder/bin" -name git) ]
   then 
     echo "Git exists - continuing..."
   else 
