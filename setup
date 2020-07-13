@@ -3,6 +3,7 @@
 
 downloadfolder="$HOME/Downloads"  #location for downloaded installation files
 gitfolder="/usr" #git install location
+gitrepo="https://git.kernel.org/pub/scm/git/git.git" #remote repo to clone git source from
 whoisthis="Eric Harrison"  #your name, used for Git config
 youremail="ericmharrison@gmail.com"  #your email, used for Git config
 
@@ -10,31 +11,60 @@ youremail="ericmharrison@gmail.com"  #your email, used for Git config
 sudo apt-get update && sudo apt-get -fy upgrade
 
 #check for any git and install if missing
-if [ ! find "$gitfolder/bin" -name git ]
-  then sudo apt-get install git
+if [ find "$gitfolder/bin" -name git ]
+  then 
+    echo "Git exists - continuing..."
+  else 
+    echo "No Git - installing..."
+    sudo apt-get install git
 fi
+
+#configure git
+git config --global --replace-all user.name "$whoisthis"
+git config --global user.email "$youremail"
+git config --global pull.rebase false
+echo
+echo "Git User Name: $(git config --global --get user.name)"
+echo "Git User Email: $(git config --global --get user.email)"
 
 #pull and install latest version of git
 
 #install prerequisite git packages
 sudo apt-get -fy install libcurl4-gnutls-dev\
-                     libexpat1-dev gettext\
-                     libz-dev\
-                     libssl-dev\
-                     asciidoc\
-                     xmlto\
-                     docbook2x
+                         libexpat1-dev\
+                         gettext\
+                         libz-dev\
+                         libssl-dev\
+                         asciidoc\
+                         xmlto\
+                         docbook2x
 
-#clone git repo
-git clone https://git.kernel.org/pub/scm/git/git.git
-
-#build and install git
-make all doc info prefix="$gitfolder"
-sudo make install install-doc install-html -install-man -prefix="$gitfolder"
+#clone git repo if it doesn't already exist, then build & install git
+if [ ! -d ~/git ]
+  then
+    cd ~
+    git clone $gitrepo
+    cd ~/git
+    make all doc info prefix="$gitfolder"
+    sudo make install install-doc install-html install-man prefix="$gitfolder"
+  else #if git exists, make sure it's the latest version
+    cd git
+    git_updated=$(git pull)
+    if [ $updated == "Already up to date." ]
+      then
+        echo "Git is already up to date."
+        break
+      else
+        git pull
+        make all doc info prefix="$gitfolder"
+        sudo make install install-doc install-html install-man prefix="$gitfolder"
+    fi
+fi
 
 #display git version
 echo "Git is installed..."
 git version
+
 
 
 
