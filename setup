@@ -1,14 +1,30 @@
 #!/bin/bash 
 #setup script for dev environment
 
+#general info
 downloadfolder="$HOME/Downloads"  #location for downloaded installation files
+
+#git info
 gitfolder="/usr" #git install location
 gitrepo="https://git.kernel.org/pub/scm/git/git.git" #remote repo to clone git source from
 whoisthis="Eric Harrison"  #your name, used for Git config
 youremail="ericmharrison@gmail.com"  #your email, used for Git config
 
+#go info
+goroot="$HOME/goroot" #go source location
+gopath="$HOME/go" #user go location for GOPATH
+gorepo="https://github.com/golang/go" #git repo for golang source
+gobootstrap="release-branch-1.4" #branch for go bootstrap toolchain
+gobranch="release-branch-1.14" #branch to install go from
+goversion="go1.14.4" #go release to install
+
 #update package list and upgrade all software
 sudo apt-get update && sudo apt-get -fy upgrade
+
+##########################
+####                  ####
+####       GIT        ####
+####                  ####
 
 #check for any git and install if missing
 if [ $(find "$gitfolder/bin" -name git) ]
@@ -58,11 +74,53 @@ if [ ! -d ~/git ]
         sudo make install install-doc install-html install-man prefix="$gitfolder"
     fi
 fi
-
 #display git version
-echo "Git is installed..."
 git version
 
+####                  #### 
+####     END GIT      #### 
+####                  ####
+##########################
 
+##########################
+####                  ####
+####        GO        ####
+####                  ####
 
+#check for go bootstrap
+cd ~
+if [ ! -d /go1.4 ]
+then
+  mkdir go1.4
+  git clone --single-branch --branch $gobootstrap $gorepo go1.4
+  cd go1.4/src
+  export CGO_ENABLED=0
+  ./make.bash
+fi
+
+#check for go install
+if [ ! -d $goroot ]
+then
+  mkdir $goroot
+  git clone --single-branch --branch $gobranch $gorepo goroot
+  cd $goroot
+  git checkout $goversion
+  cd src
+  ./all.bash
+  PATH=$PATH:$goroot/bin
+fi
+
+#create local go folder and set GOPATH
+if [ ! -d $gopath ]
+then
+  mkdir $gopath
+  cd $gopath
+  mkdir bin
+  go env -w GOPATH=$gopath
+fi
+
+####                  #### 
+####      END GO      #### 
+####                  ####
+##########################
 
