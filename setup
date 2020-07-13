@@ -53,7 +53,6 @@ if [ ! -d ~/git ]
     if [ "$git_updated" == "Already up to date." ]
       then
         echo "Git is already up to date."
-        break
       else
         make all doc info prefix="$gitfolder"
         sudo make install install-doc install-html install-man prefix="$gitfolder"
