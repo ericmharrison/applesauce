@@ -48,7 +48,7 @@ if [ ! -d ~/git ]
     make all doc info prefix="$gitfolder"
     sudo make install install-doc install-html install-man prefix="$gitfolder"
   else #if git exists, make sure it's the latest version
-    cd git
+    cd ~/git
     git_updated=$(git pull)
     if [ $updated == "Already up to date." ]
       then
