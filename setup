@@ -14,8 +14,8 @@ youremail="ericmharrison@gmail.com"  #your email, used for Git config
 goroot="$HOME/goroot" #go source location
 gopath="$HOME/go" #user go location for GOPATH
 gorepo="https://github.com/golang/go" #git repo for golang source
-gobootstrap="release-branch-1.4" #branch for go bootstrap toolchain
-gobranch="release-branch-1.14" #branch to install go from
+gobootstrap="release-branch.go1.4" #branch for go bootstrap toolchain
+gobranch="release-branch.go1.14" #branch to install go from
 goversion="go1.14.4" #go release to install
 
 #update package list and upgrade all software
