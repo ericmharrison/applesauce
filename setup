@@ -105,7 +105,7 @@ then
   git clone --single-branch --branch $gobranch $gorepo goroot
   cd $goroot
   git checkout $goversion
-  cd src
+  cd $goroot/src
   ./all.bash
   PATH=$PATH:$goroot/bin
 fi
