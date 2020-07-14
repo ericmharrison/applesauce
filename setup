@@ -99,7 +99,7 @@ then
 fi
 
 #check for go install
-if [ ! -d $goroot ]
+if [ ! -d $goroot/bin ]
 then
   mkdir $goroot
   git clone --single-branch --branch $gobranch $gorepo goroot
